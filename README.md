@@ -9,8 +9,9 @@ This project is inspired by and partially based on [UP2017腾讯互动娱乐年�
 
 ## ✨ Preview
 
-![preview](./public/preview.png)  
-(You may replace this with an actual screenshot or a live deployment link.)
+![preview](./public/preview.png)
+
+#### [Live Preview](https://zaaacqwq.github.io/portfolio/)
 
 ---
 

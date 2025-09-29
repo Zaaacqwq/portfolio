@@ -12,7 +12,7 @@ import Tween from '@tweenjs/tween.js'
 import type { Group as TweenGroup } from '@tweenjs/tween.js'
 
 import Stats from 'three/examples/jsm/libs/stats.module.js'
-import { throttle } from 'lodash'
+import throttle from 'lodash/throttle'
 
 import g from '@/assets/images/gradient.png'
 import { ParticleModelProps, TWEEN_POINT } from '@/declare/THREE'

@@ -16,6 +16,7 @@
     "@react-three/postprocessing": "^3.0.4",
     "@tweenjs/tween.js": "^25.0.0",
     "lil-gui": "^0.20.0",
+    "lodash": "^4.17.21",
     "postprocessing": "^6.37.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

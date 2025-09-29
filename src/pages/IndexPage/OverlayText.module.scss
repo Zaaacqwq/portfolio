@@ -1,0 +1,203 @@
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5; /* 比 three 画布高，比侧栏低/高都行 */
+  pointer-events: none;
+  color: #e9eef6;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+}
+
+.overlay a { pointer-events: auto; }
+
+.section {
+  position: absolute;
+  display: none;
+  max-width: 620px;
+  line-height: 1.18;
+}
+.section.active { display: block; }
+
+.link,
+.link:link,
+.link:visited,
+.link:hover,
+.link:focus,
+.link:active {
+  color: rgba(255,255,255,.92);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+/* 初始：透明+模糊+微下移；逐行延迟 */
+.line {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(8px);
+  transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease;
+  transition-delay: calc(var(--i, 0) * 120ms);
+  font-weight: 300;
+  letter-spacing: 0.2px;
+}
+.show .line {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* about */
+.about {
+  right: 10vw;
+  top: 50%;
+  line-height: 1.25;
+  transform: translateY(-50%);
+  font-size: clamp(18px, 2.5vw, 44px);
+}
+.tw {
+  display: inline-flex;
+  align-items: baseline;
+}
+.tw-caret {
+  width: .5ch;
+  margin-left: .1ch;
+  border-right: 2px solid currentColor;
+  animation: caretBlink 1s steps(1) infinite;
+  opacity: .9;
+}
+@keyframes caretBlink { 0%,49%{opacity:.9;} 50%,100%{opacity:0;} }
+
+/* projects */
+.projects {
+  left: 20vw;
+  top: 50%;
+  line-height: 1.25;
+  transform: translateY(-50%);
+  font-size: clamp(20px, 3vw, 48px);
+}
+.link {
+  display: inline-block;
+  color: rgba(255,255,255,.92);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  text-underline-offset: .2em;
+}
+.show .link:hover,
+.show .link:focus-visible {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,.35);
+  border-bottom-color: rgba(255,255,255,.75);
+}
+
+/* experience */
+.experience {
+  right: 15vw;
+  top: 50%;
+  line-height: 1.25;
+  transform: translateY(-50%);
+  font-size: clamp(18px, 2.6vw, 44px);
+}
+.job {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 1.2vw, 16px);
+  margin: 0 0 clamp(.5em, 1.0vw, 1.0em);
+}
+.bullet { font-size: 0.8em; line-height: 1.5; }
+.jobText .line + .paren { margin-top: .05em; }
+
+/* contact — 桌面端：纯文字链接，无卡片 */
+.contact {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+  font-size: clamp(18px, 3vw, 56px);
+}
+.contactInner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(96px, 8vw, 150px);
+}
+/* 桌面悬停效果（保持轻量，不加背景） */
+.contact .link {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.show .link:hover,
+.show .link:focus-visible {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,.35);
+  border-bottom-color: rgba(255,255,255,.75);
+}
+
+/* 中屏细节 */
+@media (max-width: 900px) {
+  .about, .experience { right: 5vw; max-width: 85vw; }
+  .projects { left: 8vw; max-width: 85vw; }
+  .contact { bottom: 8vh; }
+}
+
+.section:not(.active) { display: none !important; }
+
+/* ====== 移动端（<=768px）：字体更大 + 竖直单列 + 居中 ====== */
+@media (max-width: 768px) {
+  .overlay { padding: 64px 16px 96px; }
+
+  .section {
+    max-width: 92vw;
+    line-height: 1.2;
+  }
+  .line {
+    font-size: 16px;          /* 提升正文可读性 */
+    letter-spacing: 0.2px;
+    margin: 8px 0;
+  }
+  .about .line:first-child { font-size: 16px; font-weight: 600; }
+  .about .line:nth-child(2) { font-size: 16px; }
+  .about .line:nth-child(3) { font-size: 16px; opacity: .9; }
+
+  /* 项目区行内链接微调（仍为文字+下划线） */
+  .projects .job { display: flex; align-items: flex-start; gap: 8px; }
+  .projects .bullet { transform: translateY(2px); }
+  .projects .link { text-decoration: underline; word-break: break-word; }
+
+  .experience .job { margin: 6px 0; }
+  .experience .paren { opacity: .8; font-size: 14px; }
+
+  /* 联系方式：单列垂直居中，去盒子，放大字号 */
+  .contact {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    text-align: center !important;
+  }
+  .contactInner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important; /* 上下间距 */
+  }
+  .contact .link {
+    display: block;
+    text-align: center !important;
+    text-decoration: underline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 18px;          /* 手机端更大字体 */
+  }
+}

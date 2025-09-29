@@ -1,0 +1,194 @@
+.index_page {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+.canvas_wrapper {
+  position: fixed;
+  inset: 0;
+}
+
+/* 右侧/左侧隐藏按钮（保留原样） */
+.list,
+.function_list {
+  position: fixed;
+  right: .6rem;
+  top: 50%;
+  width: fit-content;
+  transform: translateY(-50%);
+
+  li {
+    width: fit-content;
+    color: #fff;
+    font-size: .4rem;
+    cursor: pointer;
+    opacity: .8;
+
+    &:hover { opacity: 1; }
+  }
+}
+.list { right: .6rem; }
+.function_list { left: .6rem; }
+
+/* 欢迎页覆盖层（只显示文本，粒子字由主 three 渲染） */
+.welcome_overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  z-index: 8;
+  pointer-events: none;
+
+  .hero_title {
+    font-size: clamp(40px, 8vw, 120px);
+    letter-spacing: 0.08em;
+    margin: 0;
+    color: #fff;
+    opacity: .10; // 让文本淡一点，粒子字是主角
+  }
+  .hero_hint {
+    margin-top: 12px;
+    font-size: 16px;
+    opacity: 0.7;
+    color: #fff;
+  }
+}
+
+/* 左侧导航（进入内容页后挂载） */
+.sidebar {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  user-select: none;
+  animation: fadeIn .4s ease both;
+
+  ul { list-style: none; margin: 0; padding: 0; }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 6px;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity .2s ease, transform .2s ease;
+    &:hover { opacity: 1; transform: translateX(2px); }
+  }
+
+  /* 小点：默认实心小圆点 */
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 999px;
+    background: #fff;
+    opacity: .9;
+    box-shadow: 0 0 6px rgba(255,255,255,.08);
+    transition:
+      width .25s ease, height .25s ease,
+      background-color .25s ease, border-color .25s ease,
+      transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+  }
+
+  /* 文本：默认折叠隐藏（只让当前页或整体 hover 时显示） */
+  .label {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #fff;
+    white-space: nowrap;
+
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateX(6px);
+    transition: opacity .25s ease, max-width .25s ease, transform .25s ease;
+  }
+
+  /* 悬停在整个侧栏时，四个名称都展开可见 */
+  &:hover .label {
+    max-width: 260px;
+    opacity: .95;
+    transform: translateX(0);
+  }
+
+  /* 当前页：空心放大圆 + 始终显示名称 */
+  .active {
+    opacity: 1;
+
+    .dot {
+      width: 14px; height: 14px;
+      background: transparent;
+      border: 2px solid #fff;
+      box-shadow: 0 0 8px rgba(255,255,255,.25);
+    }
+    .label {
+      max-width: 260px;
+      opacity: 1;
+      transform: translateX(0);
+      font-weight: 500;
+    }
+  }
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-50%) translateX(-8px); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.canvas_wrapper { position: fixed; inset: 0; z-index: 0; }
+.sidebar        { position: fixed; z-index: 6; } /* 侧栏在文字层上或下都可 */
+
+
+/* ====== 移动端适配 ====== */
+@media (max-width: 768px) {
+  .index_page {
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .sidebar { display: none; }
+
+  .mobile_nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 12px;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+
+    ul {
+      display: flex;
+      gap: 12px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,.25);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      border-radius: 999px;
+    }
+
+    li {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      opacity: .5;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #fff;
+        transform: scale(.9);
+        transition: transform .25s ease, opacity .25s ease;
+      }
+    }
+
+    .active {
+      opacity: 1;
+      .dot { transform: scale(1.3); }
+    }
+  }
+}

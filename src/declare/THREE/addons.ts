@@ -1,3 +1,5 @@
+import type * as THREE from 'three'
+
 export abstract class addonsBasic {
   public Geometry?: THREE.Object3D
   /** 渲染更新函数 */

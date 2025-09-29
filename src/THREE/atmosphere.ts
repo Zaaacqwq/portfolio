@@ -113,7 +113,7 @@ class AtmosphereParticle extends addonsBasic {
     // 实际旋转
     if (this.renderUpdate) {
       // 支持外部自定义旋转：把速度传给你
-      this.renderUpdate(this.Geometry, this._speed)
+      this.renderUpdate(this.Geometry)
     } else {
       // 内置一个简单旋转（如果你没传 renderUpdate）
       const r = this.Geometry.rotation

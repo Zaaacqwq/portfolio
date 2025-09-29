@@ -10,7 +10,7 @@ import Tween from '@tweenjs/tween.js'
 import GetFlatGeometry from '@/utils/GetFlatGeometry'
 import { BufferGeometry, Float32BufferAttribute } from 'three'
 import VerticesDuplicateRemove from '@/utils/VerticesDuplicateRemove'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 
 import OverlayText from './OverlayText'
 
@@ -20,7 +20,8 @@ const PAGES = [
   { key: 'projects',   label: 'PROJECTS',   model: 'cone'  as const },
   { key: 'experience', label: 'EXPERIENCE', model: 'cube'  as const },
   { key: 'contact',    label: 'CONTACT',    model: 'wave'  as const },
-] as const
+] as readonly { key: 'about'|'projects'|'experience'|'contact'; label: string; model: 'ball'|'cone'|'cube'|'wave' }[]
+const clamp = (i: number) => Math.max(0, Math.min(i, PAGES.length - 1))
 
 type PageIndex = -1 | 0 | 1 | 2 | 3 // -1 = Welcome（一次性）
 
@@ -142,7 +143,6 @@ function IndexPage() {
           const g = new BufferGeometry()
           let arr = new Float32Array([])
           for (const i of group.children) {
-            // @ts-expect-error
             arr = new Float32Array([...arr, ...i.geometry.attributes.position.array])
           }
           g.setAttribute('position', new Float32BufferAttribute(VerticesDuplicateRemove(arr), 3))
@@ -199,7 +199,7 @@ function IndexPage() {
       mainRef.current?.HideWelcomeText?.()
     }
 
-    const curKey = cur >= 0 ? PAGES[cur].key : null
+    const curKey = cur >= 0 ? PAGES[clamp(cur)].key : null
     const fadeUnitsByPage: Record<Exclude<typeof curKey, null>, number> = {
       about: 5,
       projects: 6,

@@ -1,16 +1,16 @@
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader'
-import { PCDLoader } from 'three/examples/jsm/loaders/PCDLoader'
-import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader'
-import { PRWMLoader } from 'three/examples/jsm/loaders/PRWMLoader'
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
+import type * as THREE from 'three'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { PCDLoader } from 'three/examples/jsm/loaders/PCDLoader.js'
+import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader.js'
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js'
+
 
 import type { Tween as TweenProps } from '@tweenjs/tween.js'
 
-export type ALL_LOADER = OBJLoader | FBXLoader | DRACOLoader | GLTFLoader | MMDLoader | PCDLoader | PDBLoader | PRWMLoader | SVGLoader
+export type ALL_LOADER = OBJLoader | FBXLoader | DRACOLoader | GLTFLoader | PCDLoader | PDBLoader | SVGLoader
 
 export interface TWEEN_POINT {
   x: number

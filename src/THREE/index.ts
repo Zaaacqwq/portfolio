@@ -1,12 +1,12 @@
 import * as THREE from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
-import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass'
-import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass'
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
-import { FocusShader } from 'three/examples/jsm/shaders/FocusShader'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js'
+import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { FocusShader } from 'three/examples/jsm/shaders/FocusShader.js'
 
 import Tween from '@tweenjs/tween.js'
 import type { Group as TweenGroup } from '@tweenjs/tween.js'
@@ -234,7 +234,7 @@ class ParticleSystem {
 
   // 性能监控
   private initStats() {
-    this.stats = Stats()
+    this.stats = new Stats()
     if (this.stats != null) {
       // 将性能监控屏区显示在左上角
       this.stats.domElement.style.position = 'absolute'
@@ -250,7 +250,9 @@ class ParticleSystem {
     this.composer = new EffectComposer(this.renderer!)
     const renderPass = new RenderPass(this.scene!, this.camera!)
     const bloomPass = new BloomPass(0.75)
-    const filmPass = new FilmPass(0.5, 0.5, 1500, 0)
+    const filmPass = new (FilmPass as any)(0.5, 0.5, 1500, 0)
+    filmPass.enabled = false
+    this.composer.addPass(filmPass)
     const shaderPass = new ShaderPass(FocusShader)
     shaderPass.uniforms.screenWidth.value = window.innerWidth
     shaderPass.uniforms.screenHeight.value = window.innerHeight
@@ -302,8 +304,8 @@ class ParticleSystem {
       if (typeof i.path === 'string') {
         if (i.loader != null) {
           const { loaderInstance, load } = i.loader
-          loaderInstance.load(i.path, (args) => {
-            finalGeometry = load(args)
+          loaderInstance.load(i.path, (data: unknown) => {
+            finalGeometry = load(data)
             finishLoad()
           })
         } else {
@@ -507,13 +509,13 @@ class ParticleSystem {
     if (this.WelcomePoints) return
 
     const font = await new Promise<any>((resolve, reject) => {
-      new FontLoader().load('/fonts/helvetiker.json', resolve, undefined, reject)
+      new FontLoader().load(import.meta.env.BASE_URL + 'fonts/helvetiker.json', resolve, undefined, reject)
     })
 
     const textGeo = new TextGeometry(text, {
       font,
       size: 160,
-      height: 30,
+      depth: 30,
       curveSegments: 8,
       bevelEnabled: true,
       bevelThickness: 4,
@@ -632,7 +634,7 @@ class ParticleSystem {
     opts?: { size?: number; height?: number; lineHeight?: number }
   ): Promise<Float32Array> {
     const font = await new Promise<any>((resolve, reject) => {
-      new FontLoader().load('/fonts/helvetiker.json', resolve, undefined, reject)
+      new FontLoader().load(import.meta.env.BASE_URL + 'fonts/helvetiker.json', resolve, undefined, reject)
     })
 
     const size = opts?.size ?? 160
@@ -644,7 +646,7 @@ class ParticleSystem {
     const geos: THREE.BufferGeometry[] = []
     lines.forEach((line, idx) => {
       const g = new TextGeometry(line, {
-        font, size, height, curveSegments: 8,
+        font, size, depth: 30, curveSegments: 8,
         bevelEnabled: true, bevelThickness: 4, bevelSize: 2, bevelSegments: 2,
       })
       g.center()

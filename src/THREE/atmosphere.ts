@@ -38,7 +38,7 @@ function getRangeRandom(e: number, t: number) {
 class AtmosphereParticle extends addonsBasic {
   private readonly longestDistance: number
   private readonly particleSum: number
-  private readonly renderUpdate?: (Point: THREE.Points) => void
+  private readonly renderUpdate?: (Point: THREE.Points, speed?: number) => void
   private readonly onChangeModel?: (Point: THREE.Points) => void
   private readonly callback?: (Point: THREE.Points) => void
   public Geometry?: THREE.Points
@@ -113,7 +113,7 @@ class AtmosphereParticle extends addonsBasic {
     // 实际旋转
     if (this.renderUpdate) {
       // 支持外部自定义旋转：把速度传给你
-      this.renderUpdate(this.Geometry)
+      this.renderUpdate(this.Geometry!, this._speed)
     } else {
       // 内置一个简单旋转（如果你没传 renderUpdate）
       const r = this.Geometry.rotation

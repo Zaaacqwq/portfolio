@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  base: "/portfolio/", // ★ 关键：项目站点必须设置
+  base: "/",
   plugins: [
     react(),
     glsl({ include: ["**/*.glsl", "**/*.vert", "**/*.frag", "**/*.wgsl"] }),

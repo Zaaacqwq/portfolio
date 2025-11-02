@@ -68,6 +68,10 @@ export default function OverlayText({
             href: "https://github.com/Zaaacqwq/ZacBlog",
           },
           { label: "Portfolio", href: "https://github.com/Zaaacqwq/portfolio" },
+          {
+            label: "discord-music-bot",
+            href: "https://github.com/Zaaacqwq/discord-music-bot",
+          },
         ].map((p, idx) => {
           // 每个项目两段“可渐显”元素：bullet、链接
           const base = idx * 2;

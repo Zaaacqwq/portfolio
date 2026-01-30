@@ -108,6 +108,7 @@ export default function OverlayText({
         } ${show ? styles.show : ""}`}
       >
         {[
+          "Play Station (Software Developer In Test)",
           "Definity Insurance (Test Automation)",
           "WDI Wise Device (Software Verification)",
           "Code Ninjas (Instructor & Developer)",

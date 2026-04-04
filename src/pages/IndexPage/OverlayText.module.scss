@@ -81,6 +81,9 @@
   right: 10vw;
   top: 50%;
   line-height: 1.25;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   transform:
     translate3d(calc(var(--shift-x) * -0.18), calc(-50% + var(--shift-y) * -0.12), 90px)
     rotateX(calc(var(--rx) * 0.5))
@@ -184,10 +187,10 @@
   border-bottom-color: rgba(255,255,255,.75);
 }
 
-.about .line:nth-child(1) { --z: 120px; --parallax: .3; }
-.about .line:nth-child(2) { --z: 70px; --parallax: .22; }
-.about .line:nth-child(3) { --z: 20px; --parallax: .14; }
-.about .line:nth-child(4) { --z: 95px; --parallax: .26; }
+.about .line {
+  --z: 80px;
+  --parallax: .22;
+}
 
 .projects .job:nth-child(1) .line { --z: 110px; }
 .projects .job:nth-child(2) .line { --z: 70px; }
@@ -234,6 +237,23 @@
   .about .line:first-child { font-size: 16px; font-weight: 600; }
   .about .line:nth-child(2) { font-size: 16px; }
   .about .line:nth-child(3) { font-size: 16px; opacity: .9; }
+  .about {
+    left: auto !important;
+    right: 10vw !important;
+    top: 50% !important;
+    width: min(92vw, 320px);
+    max-width: min(92vw, 320px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    transform: translateY(-50%) !important;
+  }
+  .about .line {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 
   /* 项目区行内链接微调（仍为文字+下划线） */
   .projects .job { display: flex; align-items: flex-start; gap: 8px; }
@@ -255,7 +275,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 20px !important; /* 上下间距 */
+    gap: 45px !important; /* 上下间距 */
   }
   .contact .link {
     display: block;

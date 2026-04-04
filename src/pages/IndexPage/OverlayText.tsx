@@ -11,8 +11,67 @@ export default function OverlayText({
   active: PageKey;
   show: boolean;
 }) {
+  const overlayRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const el = overlayRef.current;
+    if (!el || typeof window === "undefined") return;
+
+    let frame = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    const setVars = (x: number, y: number) => {
+      el.style.setProperty("--rx", `${(y * -8).toFixed(3)}deg`);
+      el.style.setProperty("--ry", `${(x * 14).toFixed(3)}deg`);
+      el.style.setProperty("--shift-x", `${(x * 32).toFixed(2)}px`);
+      el.style.setProperty("--shift-y", `${(y * 24).toFixed(2)}px`);
+      el.style.setProperty("--glow-x", `${(x * 18).toFixed(2)}px`);
+      el.style.setProperty("--glow-y", `${(y * 18).toFixed(2)}px`);
+    };
+
+    const animate = () => {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+      setVars(currentX, currentY);
+
+      if (
+        Math.abs(targetX - currentX) > 0.001 ||
+        Math.abs(targetY - currentY) > 0.001
+      ) {
+        frame = window.requestAnimationFrame(animate);
+      } else {
+        frame = 0;
+      }
+    };
+
+    const onMove = (event: MouseEvent) => {
+      targetX = event.clientX / window.innerWidth - 0.5;
+      targetY = event.clientY / window.innerHeight - 0.5;
+      if (!frame) frame = window.requestAnimationFrame(animate);
+    };
+
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      if (!frame) frame = window.requestAnimationFrame(animate);
+    };
+
+    setVars(0, 0);
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
   return (
-    <div className={styles.overlay} aria-hidden={!show}>
+    <div ref={overlayRef} className={styles.overlay} aria-hidden={!show}>
       {/* About */}
       <section
         data-page="about"

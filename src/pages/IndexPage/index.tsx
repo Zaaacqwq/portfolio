@@ -202,7 +202,7 @@ function IndexPage() {
     const curKey = cur >= 0 ? PAGES[clamp(cur)].key : null
     const fadeUnitsByPage: Record<Exclude<typeof curKey, null>, number> = {
       about: 5,
-      projects: 6,
+      projects: 9,
       experience: 9,
       contact: 4,
     } as const

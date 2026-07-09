@@ -131,6 +131,14 @@ export default function OverlayText({
             label: "discord-music-bot",
             href: "https://github.com/Zaaacqwq/discord-music-bot",
           },
+          {
+            label: "Vibe Island",
+            href: "https://github.com/Zaaacqwq/vibeIsland",
+          },
+          {
+            label: "auto UW Learn",
+            href: "https://github.com/Zaaacqwq/autoUWLearn",
+          },
         ].map((p, idx) => {
           // 每个项目两段“可渐显”元素：bullet、链接
           const base = idx * 2;

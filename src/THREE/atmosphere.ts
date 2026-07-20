@@ -4,6 +4,8 @@ import { addonsBasic } from '../declare/THREE/addons'
 
 export interface AtmosphereParticleProps {
   longestDistance: number
+  /** 粒子壳层内半径（默认 0.3 * longestDistance）。相机应位于壳层中空处，视野内密度才均匀 */
+  innerDistance?: number
   particleSum: number
   renderUpdate?: (Point: THREE.Points, speed?: number) => void
   callback?: (Point: THREE.Points) => void
@@ -70,12 +72,23 @@ class AtmosphereParticle extends addonsBasic {
     this._upMs      = options.accel?.upMs   ?? 1500
     this._downMs    = options.accel?.downMs ?? 1500
 
+    // 在球壳内做体积均匀采样：相机放在球心（中空处）时，任意视线穿过的壳层厚度相同，
+    // 因此整屏（含四角）粒子密度一致，且旋转时保持不变——不会出现“中间密、边缘疏”。
+    const rOuter = longestDistance
+    const rInner = options.innerDistance ?? longestDistance * 0.3
     const vertices = []
     for (let i = 0; i < this.particleSum; i++) {
-      const x = getRangeRandom(-1 * longestDistance, longestDistance)
-      const y = getRangeRandom(-1 * longestDistance, longestDistance)
-      const z = getRangeRandom(-1 * longestDistance, longestDistance)
-      vertices.push(x, y, z)
+      // 单位球面上的均匀方向
+      const cosPhi = getRangeRandom(-1, 1)
+      const sinPhi = Math.sqrt(1 - cosPhi * cosPhi)
+      const theta = getRangeRandom(0, Math.PI * 2)
+      // 体积均匀的半径（r ∝ cbrt，避免全部堆在外壳）
+      const r = Math.cbrt(rInner ** 3 + (rOuter ** 3 - rInner ** 3) * Math.random())
+      vertices.push(
+        r * sinPhi * Math.cos(theta),
+        r * sinPhi * Math.sin(theta),
+        r * cosPhi,
+      )
     }
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))

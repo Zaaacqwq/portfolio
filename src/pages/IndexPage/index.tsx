@@ -84,41 +84,43 @@ function IndexPage() {
   const TurnBasicNum = { firefly: 0.002 }
   const base = 0.002
   const al = 2000
+  // 相机所在 z（见 THREE/index.ts createScene：camera.position.z = 1e3）。
+  // 三层大气壳层都以相机为中心，让相机落在中空处 → 整屏密度均匀。
+  const CAMERA_Z = 1000
+  const inner = al * 0.3
 
   const { Atomsphere1, Atomsphere2, Atomsphere3 } = React.useMemo(() => {
     const A1 = new AtmosphereParticle({
       longestDistance: al,
+      innerDistance: inner,
       particleSum: 500,
       axis: 'x',
       baseSpeed: base,
       accel: { upTo: 0.02, upMs: 1250, downTo: base, downMs: 500 },
       renderUpdate: (Point, speed = base) => { Point.rotation.x -= speed },
-      callback: (Point) => { Point.position.z = -1 * al },
+      callback: (Point) => { Point.position.set(0, 0, CAMERA_Z) },
     })
 
     const A2 = new AtmosphereParticle({
       longestDistance: al,
+      innerDistance: inner,
       particleSum: 500,
       axis: 'y',
       baseSpeed: base,
       accel: { upTo: 0.02, upMs: 1250, downTo: base, downMs: 500 },
-      renderUpdate: (Point, speed = base) => {
-        Point.rotation.y += speed
-        Point.position.y = -0.2 * al
-        Point.position.z = -1 * al
-      },
+      renderUpdate: (Point, speed = base) => { Point.rotation.y += speed },
+      callback: (Point) => { Point.position.set(0, 0, CAMERA_Z) },
     })
 
     const A3 = new AtmosphereParticle({
       longestDistance: al,
+      innerDistance: inner,
       particleSum: 500,
       axis: 'z',
       baseSpeed: base / 2,
       accel: { upTo: 0.02, upMs: 1250, downTo: base / 2, downMs: 500 },
-      renderUpdate: (Point, speed = base / 2) => {
-        Point.rotation.z += speed
-        Point.position.z = -1.2 * al
-      },
+      renderUpdate: (Point, speed = base / 2) => { Point.rotation.z += speed },
+      callback: (Point) => { Point.position.set(0, 0, CAMERA_Z) },
     })
 
     return { Atomsphere1: A1, Atomsphere2: A2, Atomsphere3: A3 }

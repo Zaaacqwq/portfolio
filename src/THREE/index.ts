@@ -93,6 +93,10 @@ class ParticleSystem {
   /** 欢迎词相关 */
   private WelcomePoints?: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>
   private WelcomeBaseWidth = 1
+  /** 欢迎词圆柱面弯曲半径 = 文字宽度 × 该系数。约 0.65 圆心≈相机但偏夸张；1.0≈±29° 较自然；越大越平，Infinity 保持平铺 */
+  private WelcomeCurveFactor = 1.0
+  /** 边缘密度补偿强度：0 = 不补偿。圆心≈相机时各字母等距、密度本就均匀，这里只做少量兜底 */
+  private WelcomeEdgeDensityBoost = 0.5
   private _welcomeTransitioning = false
   private _welcomeLastT = 0
   private _welcomeStartMs = 0
@@ -638,34 +642,62 @@ class ParticleSystem {
     })
 
     const size = opts?.size ?? 160
-    const height = opts?.height ?? 30
     const lineHeight = opts?.lineHeight ?? (size * 1.2)
 
-    // 支持 \n：逐行做 TextGeometry，然后 Y 方向堆叠
+    // 支持 \n：逐行只取文字“正面”的 2D 轮廓（ShapeGeometry），再沿 Y 堆叠。
+    // 用平面正面而非立体字：粒子全部落在朝向相机的一面，弧度加大后边缘字母不会露出
+    // 侧壁/背面，可见密度也翻倍（不再有一半点撒在看不见的背面）。
     const lines = text.split('\n')
     const geos: THREE.BufferGeometry[] = []
     lines.forEach((line, idx) => {
-      const g = new TextGeometry(line, {
-        font, size, depth: 30, curveSegments: 8,
-        bevelEnabled: true, bevelThickness: 4, bevelSize: 2, bevelSegments: 2,
-      })
+      const shapes = font.generateShapes(line, size)
+      const g = new THREE.ShapeGeometry(shapes, 8)
       g.center()
       g.translate(0, -(idx * lineHeight), 0) // 向下堆叠
       geos.push(g)
     })
 
     const merged = mergeGeometries(geos, false)!
+
+    // 把整排文字弯成一个竖直圆柱面（凹面朝相机）：
+    // 水平坐标 x 映射为绕竖直轴的角度 θ = x / R，边缘字母因此向相机“抱”过来，
+    // 既更正对相机、又更近，从而不会像平铺时那样越靠边越模糊。
+    // R 取文字宽度的倍数，保证张角适中（此处约 ±20°），不会大到让边缘字母翻向侧面。
+    merged.computeBoundingBox()
+    const bb = merged.boundingBox!
+    const textWidth = bb.max.x - bb.min.x
+    const halfWidth = Math.max(1, textWidth / 2)
+    const curveRadius = textWidth * this.WelcomeCurveFactor
+
+    // 边缘密度补偿：弯曲把边缘字母推近相机、透视放大后同样多的点会被摊稀。
+    // 给每个顶点按 |x| 加权（边缘权重更高），让 MeshSurfaceSampler 在两端多撒点，
+    // 抵消放大造成的稀疏，使整排文字疏密一致。
+    const posAttr = merged.getAttribute('position')
+    const weights = new Float32Array(posAttr.count)
+    for (let i = 0; i < posAttr.count; i++) {
+      const r = Math.abs(posAttr.getX(i)) / halfWidth // 0（中心）→ 1（边缘）
+      weights[i] = 1 + this.WelcomeEdgeDensityBoost * r * r
+    }
+    merged.setAttribute('weight', new THREE.BufferAttribute(weights, 1))
+
     const tempMesh = new THREE.Mesh(merged, new THREE.MeshBasicMaterial())
-    const sampler = new MeshSurfaceSampler(tempMesh).build()
+    const sampler = new MeshSurfaceSampler(tempMesh).setWeightAttribute('weight').build()
 
     const positions = new Float32Array(count * 3)
     const v = new THREE.Vector3()
     for (let i = 0; i < count; i++) {
       sampler.sample(v)
       v.z += (Math.random() - 0.5) * 12
-      positions[i * 3 + 0] = v.x
-      positions[i * 3 + 1] = v.y
-      positions[i * 3 + 2] = v.z
+      if (curveRadius > 0 && isFinite(curveRadius)) {
+        const theta = v.x / curveRadius
+        positions[i * 3 + 0] = curveRadius * Math.sin(theta)
+        positions[i * 3 + 1] = v.y
+        positions[i * 3 + 2] = v.z + curveRadius * (1 - Math.cos(theta))
+      } else {
+        positions[i * 3 + 0] = v.x
+        positions[i * 3 + 1] = v.y
+        positions[i * 3 + 2] = v.z
+      }
     }
 
     // 原始宽度：用于初次自适配（只需从第一次 target 拿）

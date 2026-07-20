@@ -123,16 +123,21 @@ class AtmosphereParticle extends addonsBasic {
       }
     }
 
+    // 帧率归一化：以 60fps 为基准，把“每帧步进”换算成“按真实时间步进”，
+    // 这样高刷新率显示器上转速不再翻倍。封顶 4 帧，避免切后台回来时一次跳太多。
+    const frameScale = Math.min(dt / (1000 / 60), 4)
+    const speed = this._speed * frameScale
+
     // 实际旋转
     if (this.renderUpdate) {
-      // 支持外部自定义旋转：把速度传给你
-      this.renderUpdate(this.Geometry!, this._speed)
+      // 支持外部自定义旋转：把（已按时间归一化的）速度传给你
+      this.renderUpdate(this.Geometry!, speed)
     } else {
       // 内置一个简单旋转（如果你没传 renderUpdate）
       const r = this.Geometry.rotation
-      if (this.axis === 'x') r.x -= this._speed
-      else if (this.axis === 'y') r.y += this._speed
-      else r.z += this._speed * 0.5
+      if (this.axis === 'x') r.x -= speed
+      else if (this.axis === 'y') r.y += speed
+      else r.z += speed * 0.5
     }
   }
 

@@ -128,7 +128,6 @@ function IndexPage() {
 
   // --------- 模型定义：只创建一次 ---------
   const scaleNum = 600
-  let Q = 0
 
   const Models = React.useMemo<ParticleModelProps[]>(() => [
     {
@@ -167,12 +166,13 @@ function IndexPage() {
       geometry: GetFlatGeometry(),
       onAnimationFrameUpdate(PerfromPoint, TweenList) {
         const p = PerfromPoint.geometry.getAttribute('position')
+        // 相位由真实时间驱动（等价于原 60fps 下每帧 +0.08），高刷屏上波浪流速一致
+        const Q = performance.now() * 0.0048
         TweenList.forEach((val, i) => {
           if (val.isPlaying === false) {
             p.setY(i, Math.sin((i + 1 + Q) * 0.3) * 50 + Math.sin((i + Q) * 0.5) * 50 - 500)
           }
         })
-        Q += 0.08
         return true
       }
     },

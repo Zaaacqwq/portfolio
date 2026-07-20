@@ -72,6 +72,8 @@ class ParticleSystem {
   private readonly AnimateDuration: number
   private mouseV: number
   private mouseK: number
+  /** 上一帧时间戳，用于把逐帧动画归一化到真实时间（不受显示器刷新率影响） */
+  private _lastUpdateMs = performance.now()
   private hadListenMouseMove?: boolean
   private MainParticleGroup?: TweenGroup
   private readonly defaultLoader: OBJLoader
@@ -1037,15 +1039,22 @@ public async PlayWelcomeSequence(
   }, 100)
 
   // 更新场景旋转
-  private _updateRotation() {
+  private _updateRotation(frameScale = 1) {
     if (this.scene != null) {
-      this.scene.rotation.y += (this.mouseV - this.scene.rotation.y) / 50
-      this.scene.rotation.x += (this.mouseK - this.scene.rotation.x) / 50
+      // 指数平滑做帧率归一化：60fps 时 alpha=1/50，与原手感一致
+      const alpha = 1 - Math.pow(1 - 1 / 50, frameScale)
+      this.scene.rotation.y += (this.mouseV - this.scene.rotation.y) * alpha
+      this.scene.rotation.x += (this.mouseK - this.scene.rotation.x) * alpha
     }
   }
 
   // 循环更新渲染
   private update(t: number) {
+    // 本帧与上一帧的真实间隔，归一化到 60fps 基准（封顶 4 帧防止切后台回来跳变）
+    const nowMs = performance.now()
+    const frameScale = Math.min((nowMs - this._lastUpdateMs) / (1000 / 60), 4)
+    this._lastUpdateMs = nowMs
+
     // 动画插件
     Tween.update(t)
     // 更新自己的动画组
@@ -1055,7 +1064,7 @@ public async PlayWelcomeSequence(
     // 性能监测插件
     this.stats?.update()
     // 场景旋转检测
-    this._updateRotation()
+    this._updateRotation(frameScale)
     // 模型 update 钩子更新
     this.Models.forEach((val) => {
       if (val.name === this.CurrentUseModelName && val.onAnimationFrameUpdate != null) {

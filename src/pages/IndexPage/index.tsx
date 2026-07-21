@@ -279,11 +279,17 @@ function IndexPage() {
     }
 
     const onWheel = (e: WheelEvent) => {
+      // 切页锁定期间丢弃滚动量：触控板惯性会在手指抬起后持续发事件，
+      // 若继续累积，解锁瞬间残余量会立刻触发下一次翻页，导致一猛滑连翻好几页
+      // （同时反复重算粒子造成卡顿）。锁定期间归零即可，解锁后需重新滑动。
+      if (wheelLockRef.current) {
+        wheelAccumRef.current = 0
+        return
+      }
       wheelAccumRef.current += e.deltaY
-      if (wheelLockRef.current) return
       if (Math.abs(wheelAccumRef.current) < WHEEL_STEP) return
 
-      const dir = e.deltaY > 0 ? 1 : -1
+      const dir = wheelAccumRef.current > 0 ? 1 : -1
       wheelAccumRef.current = 0
 
       const cur = idxRef.current

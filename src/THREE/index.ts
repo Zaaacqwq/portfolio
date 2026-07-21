@@ -205,6 +205,9 @@ class ParticleSystem {
     this.renderer.autoClear = false
     // 渲染背景颜色同雾化的颜色
     this.renderer.setClearColor(this.scene.fog.color)
+    // 按设备像素比渲染（Retina/高分屏上粒子才锐利明亮，不会被拉伸插值抹糊）。
+    // 封顶 2，避免超高分屏渲染 4 倍以上像素拖垮性能。
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     // 定义渲染器的尺寸；在这里它会填满整个屏幕
     this.renderer.setSize(this.WIDTH, this.HEIGHT)
 
@@ -227,7 +230,11 @@ class ParticleSystem {
     // 更新渲染器的高度和宽度以及相机的纵横比
     this.HEIGHT = window.innerHeight
     this.WIDTH = window.innerWidth
+    // 同步像素比（拖到不同 DPR 的外接屏时也保持锐利），再更新尺寸
+    const pr = Math.min(window.devicePixelRatio, 2)
+    this.renderer?.setPixelRatio(pr)
     this.renderer?.setSize(this.WIDTH, this.HEIGHT)
+    this.composer?.setPixelRatio(pr)
     this.composer?.reset()
     if (this.camera != null) {
       this.camera.aspect = this.WIDTH / this.HEIGHT
@@ -254,6 +261,8 @@ class ParticleSystem {
   // 效果器
   private createEffect() {
     this.composer = new EffectComposer(this.renderer!)
+    // 后期合成的离屏缓冲也要跟随设备像素比，否则辉光/合成阶段仍是低分辨率
+    this.composer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     const renderPass = new RenderPass(this.scene!, this.camera!)
     const bloomPass = new BloomPass(0.75)
     const filmPass = new (FilmPass as any)(0.5, 0.5, 1500, 0)

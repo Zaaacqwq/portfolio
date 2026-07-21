@@ -258,8 +258,8 @@ function IndexPage() {
               "C E @ U W",
             ],
             isMobile
-              ? { count: 1200, pointSize: 1.2, occupy: 0.45, transitionMs: 900,  dwellMs: 2400 }
-              : { count: 10000, pointSize: 1.0, occupy: 0.30, transitionMs: 1000, dwellMs: 3000 }
+              ? { count: 1200, pointSize: 2.8, occupy: 0.45, transitionMs: 900,  dwellMs: 2400 }
+              : { count: 10000, pointSize: 2.4, occupy: 0.30, transitionMs: 1000, dwellMs: 3000 }
           )
         }
       })
